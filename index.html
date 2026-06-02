@@ -1,0 +1,2018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teresa's Windows 11 Practice Studio</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&family=Fira+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #232737;
+    --border: #2e3347;
+    --accent: #4f9cf9;
+    --accent2: #a78bfa;
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --text: #e8eaf6;
+    --muted: #8892b0;
+    --win-blue: #0078d4;
+    --win-bg: #1a1b26;
+    --win-taskbar: #1c1e2e;
+    --win-desktop: #1e3a5f;
+    --win-highlight: rgba(79,156,249,0.25);
+    --pulse: #4f9cf9;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── LAYOUT ── */
+  .app-shell {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    grid-template-rows: 60px 1fr;
+    height: 100vh;
+  }
+
+  /* ── TOP BAR ── */
+  .top-bar {
+    grid-column: 1/-1;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 16px;
+  }
+  .top-bar .logo {
+    font-size: 20px;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+  .top-bar .subtitle { color: var(--muted); font-size: 13px; margin-left: 4px; }
+  .progress-bar-wrap { flex: 1; display: flex; align-items: center; gap: 10px; margin-left: 24px; }
+  .progress-bar-wrap span { font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .progress-bar { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 3px; transition: width 0.5s ease; }
+  .score-badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--yellow);
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 16px 0;
+  }
+  .sidebar-section { padding: 8px 16px 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+    font-size: 13px;
+    color: var(--muted);
+    position: relative;
+  }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { border-left-color: var(--accent); background: rgba(79,156,249,0.08); color: var(--text); }
+  .nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+  .nav-item .nav-check { margin-left: auto; color: var(--green); font-size: 12px; }
+  .nav-item .nav-lock { margin-left: auto; color: var(--border); font-size: 11px; }
+
+  /* ── MAIN ── */
+  .main {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── INTRO PANEL ── */
+  .intro-panel {
+    padding: 32px;
+    flex: 1;
+    overflow-y: auto;
+  }
+  .panel-title { font-size: 26px; font-weight: 900; margin-bottom: 8px; }
+  .panel-desc { color: var(--muted); font-size: 14px; line-height: 1.7; max-width: 600px; margin-bottom: 24px; }
+  .metaphor-card {
+    background: linear-gradient(135deg, rgba(79,156,249,0.12), rgba(167,139,250,0.08));
+    border: 1px solid rgba(79,156,249,0.3);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .metaphor-card .icon { font-size: 28px; }
+  .metaphor-card .meta-text { font-size: 13px; color: var(--text); line-height: 1.6; }
+  .metaphor-card .meta-text strong { color: var(--accent); }
+  .start-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 10px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 20px rgba(79,156,249,0.3);
+  }
+  .start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(79,156,249,0.45); }
+
+  /* ── SIMULATOR WRAPPER ── */
+  .sim-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 20px;
+    gap: 16px;
+  }
+
+  /* ── INSTRUCTION BOX ── */
+  .instruction-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .instruction-box .step-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 900; flex-shrink: 0;
+  }
+  .instruction-box .inst-body { flex: 1; }
+  .instruction-box .inst-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .instruction-box .inst-text { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .instruction-box .inst-hint { font-size: 12px; color: var(--accent); margin-top: 6px; }
+
+  /* ── WINDOWS DESKTOP SIMULATOR ── */
+  .win-screen {
+    flex: 1;
+    background: var(--win-desktop);
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    overflow: hidden;
+    position: relative;
+    cursor: default;
+    background-image:
+      radial-gradient(ellipse at 20% 80%, rgba(0,120,212,0.25) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(79,156,249,0.15) 0%, transparent 50%);
+    user-select: none;
+  }
+
+  /* Desktop icons */
+  .desktop-icon {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+    width: 80px;
+    text-align: center;
+  }
+  .desktop-icon:hover { background: rgba(255,255,255,0.1); }
+  .desktop-icon.selected { background: rgba(79,156,249,0.3); border: 1px solid rgba(79,156,249,0.5); }
+  .desktop-icon .d-ico { font-size: 32px; }
+  .desktop-icon .d-label { font-size: 11px; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.8); line-height: 1.3; }
+
+  /* Taskbar */
+  .win-taskbar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 48px;
+    background: rgba(28,30,46,0.9);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 4px 16px;
+  }
+  .taskbar-icon {
+    width: 40px; height: 40px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+  }
+  .taskbar-icon:hover { background: rgba(255,255,255,0.1); }
+  .taskbar-icon.pinned::after {
+    content: '';
+    position: absolute;
+    bottom: 2px; left: 50%; transform: translateX(-50%);
+    width: 4px; height: 4px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+  .taskbar-icon.active-app { background: rgba(79,156,249,0.2); }
+  .taskbar-icon.active-app::after { width: 18px; background: var(--accent); }
+
+  .taskbar-right {
+    position: absolute;
+    right: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    font-size: 12px;
+  }
+  .taskbar-clock { text-align: center; line-height: 1.4; font-size: 11px; }
+
+  /* Notification center overlay */
+  .notif-panel {
+    position: absolute;
+    right: 8px; bottom: 56px;
+    width: 360px;
+    background: rgba(28,30,46,0.96);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 16px;
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    backdrop-filter: blur(20px);
+    z-index: 20;
+  }
+  .notif-panel.visible { display: flex; }
+  .notif-panel h3 { font-size: 14px; color: white; }
+  .notif-card {
+    background: rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.8);
+  }
+  .dnd-toggle {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    font-size: 12px; color: white;
+    transition: background 0.15s;
+  }
+  .dnd-toggle:hover { background: rgba(255,255,255,0.12); }
+  .dnd-toggle .toggle-switch {
+    width: 36px; height: 20px;
+    background: var(--border);
+    border-radius: 10px;
+    position: relative;
+    margin-left: auto;
+    transition: background 0.2s;
+  }
+  .dnd-toggle .toggle-switch.on { background: var(--accent); }
+  .dnd-toggle .toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 16px; height: 16px;
+    background: white;
+    border-radius: 50%;
+    transition: left 0.2s;
+  }
+  .dnd-toggle .toggle-switch.on::after { left: 18px; }
+
+  /* Context menu */
+  .ctx-menu {
+    position: absolute;
+    background: rgba(28,30,46,0.97);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    padding: 6px;
+    min-width: 180px;
+    display: none;
+    z-index: 30;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  .ctx-menu.visible { display: block; }
+  .ctx-item {
+    padding: 8px 12px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.85);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.1s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .ctx-item:hover { background: rgba(79,156,249,0.25); color: white; }
+  .ctx-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 4px 0; }
+
+  /* App windows */
+  .app-window {
+    position: absolute;
+    background: #1e2030;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 10;
+    min-width: 300px; min-height: 200px;
+    resize: both;
+  }
+  .app-window.open { display: flex; }
+  .app-window.maximized { top: 0 !important; left: 0 !important; right: 0 !important; bottom: 48px !important; width: 100% !important; height: calc(100% - 48px) !important; border-radius: 0; resize: none; }
+  .win-titlebar {
+    height: 36px;
+    background: #252740;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .win-title { font-size: 12px; color: rgba(255,255,255,0.7); flex: 1; }
+  .win-ctrl { width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 11px; transition: background 0.1s; }
+  .win-ctrl:hover { background: rgba(255,255,255,0.12); }
+  .win-ctrl.close:hover { background: var(--red); color: white; }
+  .win-ctrl.maximize:hover { background: rgba(255,255,255,0.12); }
+  .win-body { flex: 1; overflow-y: auto; padding: 12px; }
+
+  /* Notepad */
+  .notepad-area {
+    width: 100%; height: 100%;
+    background: #f8f9fa;
+    color: #1a1a2e;
+    font-family: 'Fira Mono', monospace;
+    font-size: 13px;
+    border: none;
+    outline: none;
+    resize: none;
+    padding: 12px;
+    line-height: 1.8;
+  }
+
+  /* File Explorer */
+  .file-explorer { display: flex; height: 100%; }
+  .fe-sidebar {
+    width: 140px;
+    background: #1a1c2e;
+    border-right: 1px solid rgba(255,255,255,0.08);
+    padding: 8px;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  .fe-sidebar-item {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: rgba(255,255,255,0.7);
+    transition: background 0.1s;
+  }
+  .fe-sidebar-item:hover, .fe-sidebar-item.active { background: rgba(79,156,249,0.2); color: white; }
+  .fe-main { flex: 1; padding: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; }
+  .fe-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    width: 72px;
+    padding: 8px 4px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 10px;
+    color: white;
+    text-align: center;
+    transition: background 0.1s;
+  }
+  .fe-item:hover { background: rgba(255,255,255,0.1); }
+  .fe-item.selected { background: rgba(79,156,249,0.3); }
+  .fe-item .fe-icon { font-size: 28px; }
+  .fe-tab-bar {
+    background: #1a1c2e;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    height: 32px;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .fe-tab {
+    padding: 4px 12px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+    border-radius: 6px 6px 0 0;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .fe-tab.active { background: #1e2030; color: white; }
+  .fe-tab .tab-close { font-size: 10px; opacity: 0.5; }
+  .fe-tab .tab-close:hover { opacity: 1; }
+  .fe-add-tab { color: rgba(255,255,255,0.4); cursor: pointer; padding: 2px 8px; font-size: 16px; }
+  .fe-add-tab:hover { color: white; }
+
+  /* Pulse animation */
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(79,156,249,0.7); }
+    50% { box-shadow: 0 0 0 10px rgba(79,156,249,0); }
+  }
+  .pulsing { animation: pulse-glow 1.5s infinite; border: 2px solid var(--accent) !important; }
+
+  /* ── FEEDBACK TOAST ── */
+  .toast-wrap {
+    position: fixed;
+    top: 80px; right: 24px;
+    display: flex; flex-direction: column; gap: 8px;
+    z-index: 100;
+    pointer-events: none;
+  }
+  .toast {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    max-width: 280px;
+    animation: slide-in 0.3s ease;
+    pointer-events: all;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .toast.success { border-color: var(--green); }
+  .toast.error { border-color: var(--red); }
+  .toast.hint { border-color: var(--accent); }
+  @keyframes slide-in { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  @keyframes slide-out { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+  .toast.removing { animation: slide-out 0.3s ease forwards; }
+
+  /* ── ACTIVITY RESULT ── */
+  .result-overlay {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.7);
+    z-index: 50;
+    display: none;
+  }
+  .result-overlay.visible { display: flex; }
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px 40px;
+    text-align: center;
+    max-width: 360px;
+  }
+  .result-icon { font-size: 48px; margin-bottom: 12px; }
+  .result-title { font-size: 22px; font-weight: 900; margin-bottom: 8px; }
+  .result-msg { color: var(--muted); font-size: 14px; margin-bottom: 20px; line-height: 1.6; }
+  .result-btns { display: flex; gap: 10px; justify-content: center; }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white; border: none;
+    padding: 10px 24px; border-radius: 8px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: transform 0.15s;
+  }
+  .btn-primary:hover { transform: translateY(-1px); }
+  .btn-secondary {
+    background: var(--surface2); color: var(--text);
+    border: 1px solid var(--border);
+    padding: 10px 24px; border-radius: 8px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* ── DRAG HELPER ── */
+  .drag-ghost {
+    position: fixed;
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.7;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  }
+  .drag-ghost.active { display: flex; }
+  .drag-ghost .dg-icon { font-size: 32px; }
+
+  /* Keyboard shortcut badge */
+  .key-badge {
+    display: inline-flex; align-items: center; gap: 3px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 2px 7px;
+    font-family: 'Fira Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* Module badges in sidebar */
+  .mod-badge {
+    display: inline-block;
+    background: var(--surface2);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 9px;
+    color: var(--muted);
+    margin-left: 4px;
+  }
+
+  /* Welcome/complete screens */
+  .welcome-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px;
+    margin-top: 24px;
+  }
+  .module-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .module-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .module-card .mc-icon { font-size: 28px; margin-bottom: 8px; }
+  .module-card .mc-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .module-card .mc-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+  .module-card .mc-status { margin-top: 10px; font-size: 11px; font-weight: 700; }
+  .module-card .mc-status.done { color: var(--green); }
+  .module-card .mc-status.active { color: var(--accent); }
+  .module-card .mc-status.locked { color: var(--muted); }
+
+  /* tooltip */
+  [data-tooltip] { position: relative; }
+  [data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.85);
+    color: white;
+    font-size: 11px;
+    white-space: nowrap;
+    padding: 4px 8px;
+    border-radius: 5px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  [data-tooltip]:hover::after { opacity: 1; }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="logo">💻 Teresa's Practice Studio</div>
+    <div class="subtitle">Windows 11 Training</div>
+    <div class="progress-bar-wrap">
+      <span id="progressLabel">0 / 24 activities</span>
+      <div class="progress-bar"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+    <div class="score-badge">⭐ <span id="scoreDisplay">0</span> pts</div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section">Modules</div>
+
+    <div class="nav-item active" data-view="welcome" onclick="showView('welcome')">
+      <span class="nav-icon">🏠</span> Home
+    </div>
+
+    <div class="sidebar-section">Module 1 · Mouse Mastery</div>
+    <div class="nav-item" data-activity="1" onclick="startActivity(1)">
+      <span class="nav-icon">🖱️</span> Single Click
+    </div>
+    <div class="nav-item" data-activity="2" onclick="startActivity(2)">
+      <span class="nav-icon">🖱️</span> Double Click
+    </div>
+    <div class="nav-item" data-activity="3" onclick="startActivity(3)">
+      <span class="nav-icon">🖱️</span> Right Click
+    </div>
+    <div class="nav-item" data-activity="4" onclick="startActivity(4)">
+      <span class="nav-icon">✋</span> Drag & Drop
+    </div>
+    <div class="nav-item" data-activity="5" onclick="startActivity(5)">
+      <span class="nav-icon">📜</span> Scrolling
+    </div>
+
+    <div class="sidebar-section">Module 2 · Desktop</div>
+    <div class="nav-item" data-activity="6" onclick="startActivity(6)">
+      <span class="nav-icon">🪟</span> Show Desktop (Win+D)
+    </div>
+    <div class="nav-item" data-activity="7" onclick="startActivity(7)">
+      <span class="nav-icon">📌</span> Pin an App
+    </div>
+    <div class="nav-item" data-activity="8" onclick="startActivity(8)">
+      <span class="nav-icon">↔️</span> Rearrange Taskbar
+    </div>
+    <div class="nav-item" data-activity="9" onclick="startActivity(9)">
+      <span class="nav-icon">⌨️</span> Shortcut Launch (Win+1)
+    </div>
+    <div class="nav-item" data-activity="10" onclick="startActivity(10)">
+      <span class="nav-icon">🔔</span> Check Notifications
+    </div>
+    <div class="nav-item" data-activity="11" onclick="startActivity(11)">
+      <span class="nav-icon">🌙</span> Do Not Disturb
+    </div>
+
+    <div class="sidebar-section">Module 3 · Files & Folders</div>
+    <div class="nav-item" data-activity="12" onclick="startActivity(12)">
+      <span class="nav-icon">📁</span> Create a Folder
+    </div>
+    <div class="nav-item" data-activity="13" onclick="startActivity(13)">
+      <span class="nav-icon">✏️</span> Rename a Folder
+    </div>
+    <div class="nav-item" data-activity="14" onclick="startActivity(14)">
+      <span class="nav-icon">🗂️</span> Sort Desktop
+    </div>
+    <div class="nav-item" data-activity="15" onclick="startActivity(15)">
+      <span class="nav-icon">📦</span> Move Files
+    </div>
+    <div class="nav-item" data-activity="16" onclick="startActivity(16)">
+      <span class="nav-icon">⚡</span> Quick Access Pinning
+    </div>
+    <div class="nav-item" data-activity="17" onclick="startActivity(17)">
+      <span class="nav-icon">➕</span> Open a New Tab
+    </div>
+
+    <div class="sidebar-section">Module 4 · Keyboard Shortcuts</div>
+    <div class="nav-item" data-activity="18" onclick="startActivity(18)">
+      <span class="nav-icon">🔍</span> Search & Open App
+    </div>
+    <div class="nav-item" data-activity="19" onclick="startActivity(19)">
+      <span class="nav-icon">📋</span> Copy Text (Ctrl+C)
+    </div>
+    <div class="nav-item" data-activity="20" onclick="startActivity(20)">
+      <span class="nav-icon">📋</span> Paste Text (Ctrl+V)
+    </div>
+    <div class="nav-item" data-activity="21" onclick="startActivity(21)">
+      <span class="nav-icon">↩️</span> Undo (Ctrl+Z)
+    </div>
+    <div class="nav-item" data-activity="22" onclick="startActivity(22)">
+      <span class="nav-icon">💾</span> Save File (Ctrl+S)
+    </div>
+
+    <div class="sidebar-section">Module 5 · Window Management</div>
+    <div class="nav-item" data-activity="23" onclick="startActivity(23)">
+      <span class="nav-icon">⬜</span> Maximize & Minimize
+    </div>
+    <div class="nav-item" data-activity="24" onclick="startActivity(24)">
+      <span class="nav-icon">🗂️</span> Task View (Win+Tab)
+    </div>
+  </div>
+
+  <!-- MAIN AREA -->
+  <div class="main" id="mainArea">
+
+    <!-- WELCOME VIEW -->
+    <div id="view-welcome" class="intro-panel">
+      <div class="panel-title">👋 Welcome back, Teresa!</div>
+      <div class="panel-desc">
+        Your Windows 11 Practice Studio is ready. Just like your salon, every tool here has its place — and the more you practice, the more natural it feels. Femi's teaching is built right in.
+      </div>
+
+      <div class="metaphor-card">
+        <div class="icon">💇‍♀️</div>
+        <div class="meta-text">
+          <strong>Your computer is like a well-organized salon.</strong><br>
+          The <strong>taskbar</strong> is your rolling trolley — your most-used tools always in reach. The <strong>desktop</strong> is your workstation. The <strong>File Explorer</strong> is your heavy metal filing cabinet. Let's get comfortable!
+        </div>
+      </div>
+
+      <div class="welcome-grid">
+        <div class="module-card" onclick="startActivity(1)">
+          <div class="mc-icon">🖱️</div>
+          <div class="mc-title">Module 1: Mouse Mastery</div>
+          <div class="mc-desc">Single click, double click, right click, drag & drop, scrolling</div>
+          <div class="mc-status active" id="ms1">→ Start here</div>
+        </div>
+        <div class="module-card" onclick="startActivity(6)">
+          <div class="mc-icon">🖥️</div>
+          <div class="mc-title">Module 2: Desktop & Taskbar</div>
+          <div class="mc-desc">Pinning apps, shortcuts, notifications, Do Not Disturb</div>
+          <div class="mc-status locked" id="ms2">🔒 Complete Module 1</div>
+        </div>
+        <div class="module-card" onclick="startActivity(12)">
+          <div class="mc-icon">📁</div>
+          <div class="mc-title">Module 3: Files & Folders</div>
+          <div class="mc-desc">Your digital filing cabinet — create, rename, sort, move</div>
+          <div class="mc-status locked" id="ms3">🔒 Complete Module 2</div>
+        </div>
+        <div class="module-card" onclick="startActivity(18)">
+          <div class="mc-icon">⌨️</div>
+          <div class="mc-title">Module 4: Keyboard Shortcuts</div>
+          <div class="mc-desc">Copy, paste, undo, save — work like a pro</div>
+          <div class="mc-status locked" id="ms4">🔒 Complete Module 3</div>
+        </div>
+        <div class="module-card" onclick="startActivity(23)">
+          <div class="mc-icon">⬜</div>
+          <div class="mc-title">Module 5: Window Management</div>
+          <div class="mc-desc">Maximize, minimize, Task View — your screen, your rules</div>
+          <div class="mc-status locked" id="ms5">🔒 Complete Module 4</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY VIEW (hidden initially) -->
+    <div id="view-activity" class="sim-area hidden">
+
+      <!-- Instruction box -->
+      <div class="instruction-box" id="instructionBox">
+        <div class="step-num" id="stepNum">1</div>
+        <div class="inst-body">
+          <div class="inst-title" id="instTitle">Activity Title</div>
+          <div class="inst-text" id="instText">Instructions go here.</div>
+          <div class="inst-hint" id="instHint"></div>
+          <!-- On-screen shortcut button for activities where OS intercepts the real key -->
+          <button id="onscreenKeyBtn" style="display:none; margin-top:10px; background:linear-gradient(135deg,#4f9cf9,#a78bfa); color:white; border:none; padding:9px 20px; border-radius:8px; font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; cursor:pointer; box-shadow:0 3px 12px rgba(79,156,249,0.35);" onclick="handleOnscreenKey()">
+            ⌨️ <span id="onscreenKeyLabel">Press Win + 1</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Simulated Windows desktop -->
+      <div class="win-screen" id="winScreen"
+        oncontextmenu="handleDesktopRightClick(event)"
+        onclick="handleDesktopClick(event)"
+        ondblclick="handleDesktopDblClick(event)"
+      >
+
+        <!-- Desktop Icons -->
+        <div class="desktop-icon" id="icon-browser" style="top:30px;left:30px"
+          onclick="handleIconClick(event,'browser')"
+          ondblclick="handleIconDblClick(event,'browser')"
+          oncontextmenu="handleIconRightClick(event,'browser')"
+          data-tooltip="Google Chrome — Double-click to open"
+        >
+          <div class="d-ico">🌐</div>
+          <div class="d-label">Chrome</div>
+        </div>
+
+        <div class="desktop-icon" id="icon-invoices" style="top:30px;left:120px"
+          onclick="handleIconClick(event,'invoices')"
+          ondblclick="handleIconDblClick(event,'invoices')"
+          oncontextmenu="handleIconRightClick(event,'invoices')"
+          data-tooltip="Invoices folder"
+        >
+          <div class="d-ico">📁</div>
+          <div class="d-label">Invoices</div>
+        </div>
+
+        <div class="desktop-icon" id="icon-proposal" style="top:30px;left:210px"
+          onclick="handleIconClick(event,'proposal')"
+          ondblclick="handleIconDblClick(event,'proposal')"
+          oncontextmenu="handleIconRightClick(event,'proposal')"
+          data-tooltip="Proposal.docx"
+        >
+          <div class="d-ico">📄</div>
+          <div class="d-label">Proposal.docx</div>
+        </div>
+
+        <div class="desktop-icon" id="icon-invoice1" style="top:140px;left:30px"
+          onclick="handleIconClick(event,'invoice1')"
+          oncontextmenu="handleIconRightClick(event,'invoice1')"
+          data-tooltip="Invoice_Jan.pdf"
+        >
+          <div class="d-ico">🧾</div>
+          <div class="d-label">Invoice_Jan.pdf</div>
+        </div>
+
+        <div class="desktop-icon" id="icon-invoice2" style="top:140px;left:120px"
+          onclick="handleIconClick(event,'invoice2')"
+          oncontextmenu="handleIconRightClick(event,'invoice2')"
+          data-tooltip="Invoice_Feb.pdf"
+        >
+          <div class="d-ico">🧾</div>
+          <div class="d-label">Invoice_Feb.pdf</div>
+        </div>
+
+        <div class="desktop-icon" id="icon-notepad" style="top:140px;left:210px"
+          onclick="handleIconClick(event,'notepad')"
+          ondblclick="handleIconDblClick(event,'notepad')"
+          oncontextmenu="handleIconRightClick(event,'notepad')"
+          data-tooltip="Notepad — press Win key to search"
+        >
+          <div class="d-ico">📝</div>
+          <div class="d-label">Notepad</div>
+        </div>
+
+        <!-- Long scroll document for Activity 5 -->
+        <div id="scrollDoc" style="display:none; position:absolute; top:20px; left:20px; right:20px; bottom:60px; background:rgba(255,255,255,0.07); border-radius:8px; overflow-y:scroll; padding:16px; font-size:12px; color:rgba(255,255,255,0.6); line-height:2.0;" onscroll="handleDocScroll(this)">
+          <div style="font-weight:700;color:white;font-size:14px;margin-bottom:12px;">📋 Styles & Smiles — Client List</div>
+          <p>Client 1: Maria Johnson — Full colour, balayage highlights. Next appointment May 15. Prefers cool tones.</p>
+          <p>Client 2: Sandra Lee — Brazilian blowout. Allergic to keratin additives. Note: bring gloves. Books every 3 months.</p>
+          <p>Client 3: Denise Williams — Natural styles only. Prefers loc maintenance every 6 weeks. Very particular about products.</p>
+          <p>Client 4: Aisha Brown — Relaxer touch-up. Last visit March 20. Very punctual. Tip: arrives 10 mins early.</p>
+          <p>Client 5: Carmen Rodriguez — Silk press. Premium products only. Tip well. Brings her own leave-in.</p>
+          <p>Client 6: Patrice Davis — Braids (knotless). Takes approximately 4 hours. Books Saturdays. Prefers medium length.</p>
+          <p>Client 7: Rebecca Singh — Colour correction. Previous box dye disaster. Patience required. Multiple sessions needed.</p>
+          <p>Client 8: Naomi Clarke — Wig install + sew-in. Bring extra tracks. Closure install preferred. Books monthly.</p>
+          <p>Client 9: Tanya Powell — Trim only. Monthly visitor. Very loyal. Refers friends frequently.</p>
+          <p>Client 10: Gloria Martinez — Hot oil treatment + roller set. Classic techniques. No heat above 375°F.</p>
+          <p>Client 11: Wendy Thomas — New client. Referral from Sandra Lee. Intro appointment. Patch test required.</p>
+          <p>Client 12: Phyllis Brooks — Highlights + cut. Prefers ash tones. Sensitive scalp. Use gentle developer only.</p>
+          <p>Client 13: Donna King — Protective style. Box braids, waist length. Books 2 months in advance.</p>
+          <p>Client 14: Yvette Simmons — Flat iron + trim. Very particular about edges. Always check twice before finishing.</p>
+          <p>Client 15: Rochelle Grant — Colour refresh. Existing balayage. Touch up roots every 8 weeks.</p>
+          <p>Client 16: Sheila Okafor — Natural wash & style. TWA. Prefers finger coiling technique. No combing.</p>
+          <div style="margin-top:32px; padding:16px; background:rgba(52,211,153,0.15); border:1px solid rgba(52,211,153,0.4); border-radius:8px; color:#34d399; font-weight:700; font-size:13px; text-align:center;">
+            ✅ You've reached the bottom of the list! Great scrolling, Teresa!
+          </div>
+        </div>
+
+        <!-- Notepad window -->
+        <div class="app-window" id="notepadWindow" style="top:60px;left:80px;width:420px;height:280px;">
+          <div class="win-titlebar">
+            <span style="font-size:14px;">📝</span>
+            <span class="win-title">Notepad — Untitled</span>
+            <div class="win-ctrl" onclick="minimizeWindow('notepad')" data-tooltip="Minimize">─</div>
+            <div class="win-ctrl maximize" onclick="toggleMaximize('notepad')" data-tooltip="Maximize / Restore">⬜</div>
+            <div class="win-ctrl close" onclick="closeWindow('notepad')" data-tooltip="Close">✕</div>
+          </div>
+          <div class="win-body" style="padding:0;">
+            <textarea class="notepad-area" id="notepadText" placeholder="Start typing here..."
+              onkeydown="handleNotepadKey(event)"
+            >Welcome to Styles & Smiles!
+This is your practice document.
+You can copy, paste, undo, and save text here.</textarea>
+          </div>
+        </div>
+
+        <!-- File Explorer window -->
+        <div class="app-window" id="explorerWindow" style="top:40px;left:60px;width:480px;height:320px;">
+          <div class="win-titlebar">
+            <span style="font-size:14px;">📁</span>
+            <span class="win-title">File Explorer</span>
+            <div class="win-ctrl" onclick="minimizeWindow('explorer')" data-tooltip="Minimize">─</div>
+            <div class="win-ctrl maximize" onclick="toggleMaximize('explorer')" data-tooltip="Maximize / Restore">⬜</div>
+            <div class="win-ctrl close" onclick="closeWindow('explorer')" data-tooltip="Close">✕</div>
+          </div>
+          <div class="fe-tab-bar" id="feTabBar">
+            <div class="fe-tab active" id="tab1">📁 Home <span class="tab-close">✕</span></div>
+            <div class="fe-add-tab" onclick="addExplorerTab()" data-tooltip="New tab (Ctrl+T)">+</div>
+          </div>
+          <div class="file-explorer">
+            <div class="fe-sidebar">
+              <div class="fe-sidebar-item active" onclick="feNavigate('home')">🏠 Home</div>
+              <div class="fe-sidebar-item" onclick="feNavigate('desktop')">🖥️ Desktop</div>
+              <div class="fe-sidebar-item" onclick="feNavigate('downloads')">⬇️ Downloads</div>
+              <div class="fe-sidebar-item" onclick="feNavigate('documents')">📄 Documents</div>
+              <div class="fe-sidebar-item" onclick="feNavigate('pictures')">🖼️ Pictures</div>
+              <div class="fe-sidebar-item" id="qaInvoices" onclick="feNavigate('invoices')" style="display:none;">📁 Invoices</div>
+            </div>
+            <div class="fe-main" id="feMain">
+              <div class="fe-item" onclick="feSelectItem(this,'desktop')"><div class="fe-icon">🖥️</div>Desktop</div>
+              <div class="fe-item" onclick="feSelectItem(this,'downloads')"><div class="fe-icon">⬇️</div>Downloads</div>
+              <div class="fe-item" onclick="feSelectItem(this,'documents')"><div class="fe-icon">📄</div>Documents</div>
+              <div class="fe-item" onclick="feSelectItem(this,'pictures')"><div class="fe-icon">🖼️</div>Pictures</div>
+              <div class="fe-item" onclick="feSelectItem(this,'invoices')"><div class="fe-icon">📁</div>Invoices</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Task View overlay -->
+        <div id="taskViewOverlay" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);z-index:15;padding:20px 40px;overflow:auto;">
+          <div style="color:white;font-size:14px;font-weight:700;margin-bottom:16px;">Task View — All Open Windows</div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;">
+            <div style="background:rgba(255,255,255,0.1);border-radius:10px;width:160px;height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;border:2px solid rgba(79,156,249,0.5);" onclick="closeTaskView()">
+              <div style="font-size:28px;">📝</div>
+              <div style="font-size:11px;color:white;">Notepad</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.1);border-radius:10px;width:160px;height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;" onclick="closeTaskView()">
+              <div style="font-size:28px;">📁</div>
+              <div style="font-size:11px;color:white;">File Explorer</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.1);border-radius:10px;width:160px;height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;" onclick="closeTaskView()">
+              <div style="font-size:28px;">🌐</div>
+              <div style="font-size:11px;color:white;">Chrome</div>
+            </div>
+          </div>
+          <div style="margin-top:20px;color:rgba(255,255,255,0.5);font-size:12px;">Click any window to switch to it, or press Win+Tab again to close.</div>
+        </div>
+
+        <!-- Start menu -->
+        <div id="startMenu" style="display:none;position:absolute;bottom:56px;left:50%;transform:translateX(-50%);width:340px;background:rgba(20,22,36,0.97);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:20px;z-index:20;backdrop-filter:blur(20px);">
+          <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:10px;">SEARCH OR TYPE APP NAME</div>
+          <input id="startSearch" type="text" placeholder="Type 'Notepad'..." style="width:100%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:8px 12px;color:white;font-family:'Nunito',sans-serif;font-size:13px;outline:none;margin-bottom:14px;"
+            oninput="handleStartSearch(this.value)">
+          <div id="startResults" style="display:none;font-size:13px;color:white;">
+            <div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;background:rgba(79,156,249,0.2);cursor:pointer;" onclick="openFromStart()">
+              <span style="font-size:20px;">📝</span> Notepad
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+            <div style="text-align:center;cursor:pointer;padding:8px;border-radius:8px;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background=''" onclick="closeStartMenu()">
+              <div style="font-size:22px;">📝</div><div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:4px;">Notepad</div>
+            </div>
+            <div style="text-align:center;cursor:pointer;padding:8px;border-radius:8px;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background=''">
+              <div style="font-size:22px;">🌐</div><div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:4px;">Chrome</div>
+            </div>
+            <div style="text-align:center;cursor:pointer;padding:8px;border-radius:8px;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background=''">
+              <div style="font-size:22px;">📁</div><div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:4px;">Explorer</div>
+            </div>
+            <div style="text-align:center;cursor:pointer;padding:8px;border-radius:8px;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background=''">
+              <div style="font-size:22px;">⚙️</div><div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:4px;">Settings</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notification panel -->
+        <div class="notif-panel" id="notifPanel">
+          <h3>🔔 Notifications</h3>
+          <div class="notif-card">📧 New email from Aisha Brown — appointment request</div>
+          <div class="notif-card">📱 WhatsApp: "Hi Teresa, can I book Saturday?"</div>
+          <div class="dnd-toggle" id="dndToggle" onclick="toggleDND()">
+            🌙 Do Not Disturb
+            <div class="toggle-switch" id="dndSwitch"></div>
+          </div>
+        </div>
+
+        <!-- Context menu -->
+        <div class="ctx-menu" id="ctxMenu">
+          <div class="ctx-item" onclick="ctxAction('view')">👁️ View</div>
+          <div class="ctx-item" onclick="ctxAction('sort')">🗂️ Sort by → Item Type</div>
+          <div class="ctx-item" onclick="ctxAction('refresh')">🔄 Refresh</div>
+          <div class="ctx-divider"></div>
+          <div class="ctx-item" onclick="ctxAction('new-folder')">📁 New → Folder</div>
+          <div class="ctx-item" onclick="ctxAction('paste')">📋 Paste</div>
+        </div>
+
+        <!-- Icon right-click context menu -->
+        <div class="ctx-menu" id="iconCtxMenu">
+          <div class="ctx-item" onclick="iconCtxAction('open')">📂 Open</div>
+          <div class="ctx-item" onclick="iconCtxAction('pin-taskbar')">📌 Pin to taskbar</div>
+          <div class="ctx-item" onclick="iconCtxAction('pin-qa')">⚡ Pin to Quick Access</div>
+          <div class="ctx-divider"></div>
+          <div class="ctx-item" onclick="iconCtxAction('rename')">✏️ Rename</div>
+          <div class="ctx-item" onclick="iconCtxAction('delete')">🗑️ Delete</div>
+        </div>
+
+        <!-- Taskbar -->
+        <div class="win-taskbar" id="winTaskbar">
+          <div class="taskbar-icon" id="tb-start" onclick="toggleStartMenu()" data-tooltip="Start">🪟</div>
+          <div class="taskbar-icon" id="tb-search" onclick="toggleStartMenu()" data-tooltip="Search">🔍</div>
+          <div class="taskbar-icon pinned" id="tb-explorer" onclick="openWindow('explorer')" data-tooltip="File Explorer">📁</div>
+          <div class="taskbar-icon pinned" id="tb-chrome" ondblclick="handleIconDblClick(event,'browser')" data-tooltip="Chrome">🌐</div>
+          <div class="taskbar-icon" id="tb-whatsapp" data-tooltip="WhatsApp">💬</div>
+          <div class="taskbar-icon" id="tb-maps" data-tooltip="Drag me LEFT of WhatsApp!">🗺️</div>
+          <div class="taskbar-icon" id="tb-bell" onclick="toggleNotifPanel()" data-tooltip="Notifications (Win+N)">🔔</div>
+          <div class="taskbar-right">
+            <div class="taskbar-clock" id="taskbarClock">12:00<br>PM</div>
+          </div>
+        </div>
+
+      </div><!-- /win-screen -->
+
+      <!-- Result overlay (inside sim area) -->
+      <div class="result-overlay" id="resultOverlay">
+        <div class="result-card">
+          <div class="result-icon" id="resultIcon">✅</div>
+          <div class="result-title" id="resultTitle">Well done!</div>
+          <div class="result-msg" id="resultMsg">You completed the activity.</div>
+          <div class="result-btns">
+            <button class="btn-primary" id="resultNext" onclick="nextActivity()">Next Activity →</button>
+            <button class="btn-secondary" onclick="retryActivity()">Try Again</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /view-activity -->
+
+  </div><!-- /main -->
+</div>
+
+<!-- Drag ghost -->
+<div class="drag-ghost" id="dragGhost">
+  <div class="dg-icon" id="dragGhostIcon">📁</div>
+  <div id="dragGhostLabel">file</div>
+</div>
+
+<!-- Toasts -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+// ── STATE ──
+const state = {
+  currentActivity: null,
+  completed: new Set(),
+  score: 0,
+  dndOn: false,
+  explorerTabs: 1,
+  notepadSaved: false,
+  copiedText: false,
+  sortedDesktop: false,
+  selectedIcons: new Set(),
+  taskbarOrder: ['start','search','explorer','chrome','maps','whatsapp','bell'],
+  draggedIcon: null,
+  draggedFrom: null,
+  hoverTimer: null,
+  iconMoved: false,
+  newFolderCreated: false,
+  folderRenamed: false,
+  filesMovedToInvoices: false,
+  invoicesPinned: false,
+  windowMaximized: false,
+  windowMinimized: false,
+  taskViewOpened: false,
+  appPinned: false,
+  taskbarRearranged: false,
+  shortcutLaunched: false,
+  startMenuOpened: false,
+  notepadOpenedFromSearch: false,
+  rightClickTarget: null,
+  lastKeyShortcut: null,
+};
+
+// ── ACTIVITIES DATA ──
+const activities = {
+  1: {
+    title: "Single Click: Select Without Opening",
+    text: "Click ONCE on the Chrome icon on the desktop. A single click just selects it — like browsing the menu at the salon without ordering yet.",
+    hint: "💡 Tip from Femi: Single click = just highlight. No action happens yet.",
+    action: "single-click-icon",
+    target: "browser"
+  },
+  2: {
+    title: "Double Click: Open an Application",
+    text: "Now DOUBLE-CLICK the Chrome icon to fully open it. Two quick clicks tells Windows you really mean it!",
+    hint: "💡 Rule of thumb: if single click does nothing, try double click.",
+    action: "double-click-icon",
+    target: "browser"
+  },
+  3: {
+    title: "Right Click: Explore More Options",
+    text: "RIGHT-CLICK the Chrome icon. On Windows, right-clicking is like the long-press on your phone — it reveals a hidden menu of options.",
+    hint: "💡 Femi says: Right click = press and hold on a touchscreen. Same idea!",
+    action: "right-click-icon",
+    target: "browser"
+  },
+  4: {
+    title: "Drag & Drop: Move a File",
+    text: "Click and hold the Invoices folder icon, then drag it to a new position on the desktop. Release to drop it there.",
+    hint: "💡 The desktop is your canvas — rearrange it however you like!",
+    action: "drag-icon",
+    target: "invoices"
+  },
+  5: {
+    title: "Scrolling: Navigate a Long Document",
+    text: "A long client list has appeared. Use your mouse scroll wheel (or drag the scrollbar) to reach the bottom of the document.",
+    hint: "💡 Imagine unrolling a scroll of paper — you're sliding the view down.",
+    action: "scroll-to-bottom",
+    target: null
+  },
+  6: {
+    title: "Show Desktop: Windows + D",
+    text: "Press Windows + D on your keyboard (or click anywhere on this desktop). This minimizes all open windows at once — like clearing your workstation in one sweep!",
+    hint: "💡 Press Win+D again to bring everything back.",
+    action: "press-win-d",
+    target: null
+  },
+  7: {
+    title: "Pin an App to the Taskbar",
+    text: "Right-click the Notepad icon on the desktop, then choose 'Pin to taskbar' from the menu. This adds it to your rolling trolley!",
+    hint: "💡 Your taskbar = the rolling trolley at your station. Keep your favourites there.",
+    action: "pin-to-taskbar",
+    target: "notepad"
+  },
+  8: {
+    title: "Rearrange the Taskbar",
+    text: "Drag the Maps icon (🗺️) in the taskbar and drop it to the LEFT of WhatsApp (💬) to reorder your apps.",
+    hint: "💡 Keep things in the order that makes sense to you.",
+    action: "rearrange-taskbar",
+    target: null
+  },
+  9: {
+    title: "Shortcut Launch: Windows + 1",
+    text: "Press Windows + 1 on your keyboard to launch the first app pinned to your taskbar (File Explorer).",
+    hint: "💡 Win+1 opens the 1st pinned app, Win+2 opens the 2nd, and so on.",
+    action: "press-win-1",
+    target: null
+  },
+  10: {
+    title: "Open the Notification Center",
+    text: "Click the bell icon 🔔 in the taskbar (or press Windows + N) to open your Notification Center.",
+    hint: "💡 This shows you all your alerts — like checking your messages between clients.",
+    action: "open-notif",
+    target: null
+  },
+  11: {
+    title: "Toggle Do Not Disturb",
+    text: "In the Notification Center, click the 'Do Not Disturb' toggle to silence alerts. Perfect for when you're with a client!",
+    hint: "💡 The moon icon means sleep — your computer won't bother you.",
+    action: "toggle-dnd",
+    target: null
+  },
+  12: {
+    title: "Create a New Folder",
+    text: "Right-click on the desktop and select 'New → Folder' from the menu. This creates a fresh folder on your desktop.",
+    hint: "💡 Think of it as grabbing a new empty folder from the supply shelf.",
+    action: "create-folder",
+    target: null
+  },
+  13: {
+    title: "Rename a Folder",
+    text: "Right-click the new folder on the desktop, then choose 'Rename' from the menu. Type the name 'Invoices 2026' and press Enter.",
+    hint: "💡 One click selects, right-click + Rename lets you change its name.",
+    action: "rename-folder",
+    target: null
+  },
+  14: {
+    title: "Sort Desktop by Item Type",
+    text: "Right-click on the desktop background, then choose 'Sort by → Item Type'. This groups all similar files together — folders with folders, PDFs with PDFs!",
+    hint: "💡 Like sorting your products by brand on the shelf.",
+    action: "sort-desktop",
+    target: null
+  },
+  15: {
+    title: "Move Multiple Files into a Folder",
+    text: "Click the Invoice_Jan.pdf icon, then Ctrl+click Invoice_Feb.pdf to select both. Now drag them into the Invoices folder.",
+    hint: "💡 Select multiple files by clicking one, then holding Ctrl and clicking others.",
+    action: "move-files",
+    target: null
+  },
+  16: {
+    title: "Pin a Folder to Quick Access",
+    text: "Right-click the Invoices folder and choose 'Pin to Quick Access'. It will now appear permanently in the left pane of File Explorer.",
+    hint: "💡 Quick Access = your VIP shelf — things you reach for most often.",
+    action: "pin-to-qa",
+    target: "invoices"
+  },
+  17: {
+    title: "Open a New Tab in File Explorer",
+    text: "The File Explorer is open. Click the + button in the tab bar to open a second tab — just like opening a new browser tab!",
+    hint: "💡 You can also press Ctrl+T inside File Explorer.",
+    action: "open-fe-tab",
+    target: null
+  },
+  18: {
+    title: "Search & Open Notepad",
+    text: "Click the 🪟 Start button (or 🔍 Search) in the taskbar. Type 'Notepad' in the search box, then click it to open.",
+    hint: "💡 The Start menu is like looking up a product in a catalogue — search by name.",
+    action: "open-from-start",
+    target: null
+  },
+  19: {
+    title: "Copy Text (Ctrl + C)",
+    text: "Notepad is open. Select the first line of text by clicking and dragging, then press Ctrl + C to copy it to your clipboard.",
+    hint: "💡 Ctrl+C = you've copied it to your invisible clipboard. Nothing visible happens yet.",
+    action: "copy-text",
+    target: null
+  },
+  20: {
+    title: "Paste Text (Ctrl + V)",
+    text: "Click at the end of the text in Notepad, then press Ctrl + V to paste what you copied. Watch your text appear!",
+    hint: "💡 Remember: Ctrl+P is for Print! Paste is always Ctrl+V.",
+    action: "paste-text",
+    target: null
+  },
+  21: {
+    title: "Undo (Ctrl + Z)",
+    text: "Oops! Some text was accidentally deleted in Notepad. Press Ctrl + Z to undo the mistake and bring it back.",
+    hint: "💡 Ctrl+Z is your digital safety net. Made a mistake? Undo it!",
+    action: "undo-action",
+    target: null
+  },
+  22: {
+    title: "Save Your File (Ctrl + S)",
+    text: "Press Ctrl + S in Notepad to save your document. The title bar will update when it's saved.",
+    hint: "💡 Save often! Like pressing 'confirm' on a booking — make it permanent.",
+    action: "save-file",
+    target: null
+  },
+  23: {
+    title: "Maximize & Minimize a Window",
+    text: "Notepad is open. Click the square ⬜ icon to maximize it. Then click the dash ─ icon to minimize it to the taskbar.",
+    hint: "💡 Maximize = full screen. Minimize = tuck it away without closing it.",
+    action: "maximize-minimize",
+    target: null
+  },
+  24: {
+    title: "Task View (Windows + Tab)",
+    text: "Press Windows + Tab to open Task View — a birds-eye view of ALL your open windows. Click one to switch to it.",
+    hint: "💡 Task View is like looking at all your chairs at once to see which is occupied.",
+    action: "task-view",
+    target: null
+  }
+};
+
+// ── NAVIGATION ──
+function showView(view) {
+  document.querySelectorAll('[data-view]').forEach(el => el.classList.toggle('active', el.dataset.view === view));
+  document.getElementById('view-welcome').classList.toggle('hidden', view !== 'welcome');
+  document.getElementById('view-activity').classList.toggle('hidden', view !== 'activity');
+}
+
+function updateSidebar() {
+  document.querySelectorAll('[data-activity]').forEach(el => {
+    const n = parseInt(el.dataset.activity);
+    const check = el.querySelector('.nav-check') || document.createElement('span');
+    check.className = 'nav-check';
+    if (state.completed.has(n)) {
+      check.textContent = '✓';
+      if (!el.querySelector('.nav-check')) el.appendChild(check);
+    }
+    el.classList.toggle('active', n === state.currentActivity);
+  });
+}
+
+function updateProgress() {
+  const total = 24;
+  const done = state.completed.size;
+  document.getElementById('progressLabel').textContent = `${done} / ${total} activities`;
+  document.getElementById('progressFill').style.width = `${(done/total)*100}%`;
+  document.getElementById('scoreDisplay').textContent = state.score;
+  updateModuleStatus();
+}
+
+function updateModuleStatus() {
+  const m1done = [1,2,3,4,5].every(n => state.completed.has(n));
+  const m2done = [6,7,8,9,10,11].every(n => state.completed.has(n));
+  const m3done = [12,13,14,15,16,17].every(n => state.completed.has(n));
+  const m4done = [18,19,20,21,22].every(n => state.completed.has(n));
+  const statuses = [
+    {el:'ms1', done:m1done, active:true},
+    {el:'ms2', done:m2done, active:m1done},
+    {el:'ms3', done:m3done, active:m2done},
+    {el:'ms4', done:m4done, active:m3done},
+    {el:'ms5', done:false, active:m4done},
+  ];
+  statuses.forEach(s => {
+    const el = document.getElementById(s.el);
+    if (!el) return;
+    if (s.done) { el.className='mc-status done'; el.textContent='✅ Complete!'; }
+    else if (s.active) { el.className='mc-status active'; el.textContent='→ Start here'; }
+    else { el.className='mc-status locked'; el.textContent='🔒 Complete previous module'; }
+  });
+}
+
+// ── START ACTIVITY ──
+function startActivity(n) {
+  state.currentActivity = n;
+  const act = activities[n];
+  showView('activity');
+  document.getElementById('stepNum').textContent = n;
+  document.getElementById('instTitle').textContent = act.title;
+  document.getElementById('instText').textContent = act.text;
+  document.getElementById('instHint').textContent = act.hint || '';
+
+  // Reset result overlay
+  document.getElementById('resultOverlay').classList.remove('visible');
+
+  // Setup activity-specific state
+  setupActivity(n);
+  updateSidebar();
+  setupHoverTimer();
+
+  // Keyboard listener for shortcut activities
+  document.onkeydown = handleGlobalKey;
+}
+
+function setupActivity(n) {
+  const ws = document.getElementById('winScreen');
+  // Hide special elements
+  document.getElementById('scrollDoc').style.display = 'none';
+  document.getElementById('taskViewOverlay').style.display = 'none';
+  closeCtxMenus();
+  document.getElementById('notifPanel').classList.remove('visible');
+
+  // Hide on-screen key button by default
+  const keyBtn = document.getElementById('onscreenKeyBtn');
+  keyBtn.style.display = 'none';
+
+  // Show/hide windows as needed
+  if ([5].includes(n)) {
+    document.getElementById('scrollDoc').style.display = 'block';
+  }
+  if ([17].includes(n)) { openWindow('explorer'); }
+  if ([18,19,20,21,22,23].includes(n)) { openWindow('notepad'); }
+  if (n === 21) {
+    // Simulate deleted text
+    document.getElementById('notepadText').value = "Welcome to Styles & Smiles!\nThis is your practice document.\n";
+    toast("⚠️ Uh oh! Some text was deleted. Press Ctrl+Z to undo!", 'error', 4000);
+  }
+  if (n === 19) {
+    state.copiedText = false;
+    document.getElementById('notepadText').value = "Welcome to Styles & Smiles!\nThis is your practice document.\nYou can copy, paste, undo, and save text here.";
+  }
+
+  // Activities 9 and 24 use Win+1 / Win+Tab which the OS intercepts — show on-screen button
+  if (n === 9) {
+    keyBtn.style.display = 'inline-block';
+    document.getElementById('onscreenKeyLabel').textContent = 'Click here to simulate Win + 1';
+  }
+  if (n === 24) {
+    keyBtn.style.display = 'inline-block';
+    document.getElementById('onscreenKeyLabel').textContent = 'Click here to simulate Win + Tab';
+  }
+
+  // Setup taskbar drag for activity 8
+  if (n === 8) { setupTaskbarDrag(); }
+
+  // Pulse the target
+  document.querySelectorAll('.pulsing').forEach(el => el.classList.remove('pulsing'));
+  const act = activities[n];
+  if (act.target) {
+    const target = document.getElementById(`icon-${act.target}`) || document.getElementById(`tb-${act.target}`);
+    if (target) target.classList.add('pulsing');
+  }
+  if (n === 8) { document.getElementById('tb-maps').classList.add('pulsing'); }
+  if (n === 10) { document.getElementById('tb-bell').classList.add('pulsing'); }
+  if (n === 6 || n === 9 || n === 24) {
+    // keyboard activities — pulse the desktop area
+    ws.style.outline = '2px solid var(--accent)';
+    setTimeout(() => ws.style.outline = '', 3000);
+  } else {
+    ws.style.outline = '';
+  }
+  if (n === 7) { document.getElementById('icon-notepad').classList.add('pulsing'); }
+  if (n === 16) { document.getElementById('icon-invoices').classList.add('pulsing'); }
+  if (n === 17) { document.getElementById('feMain').style.outline = '2px solid var(--accent)'; }
+  else { if (document.getElementById('feMain')) document.getElementById('feMain').style.outline = ''; }
+}
+
+// ── ACTIVITY COMPLETION ──
+function completeActivity(n, msg) {
+  if (state.completed.has(n)) return;
+  state.completed.add(n);
+  state.score += 10;
+  document.querySelectorAll('.pulsing').forEach(el => el.classList.remove('pulsing'));
+
+  const overlay = document.getElementById('resultOverlay');
+  document.getElementById('resultIcon').textContent = '🎉';
+  document.getElementById('resultTitle').textContent = 'Brilliant!';
+  document.getElementById('resultMsg').textContent = msg || 'You nailed it!';
+
+  const nextN = n + 1;
+  const nextBtn = document.getElementById('resultNext');
+  if (nextN <= 24) {
+    nextBtn.textContent = `Next: Activity ${nextN} →`;
+    nextBtn.onclick = () => startActivity(nextN);
+  } else {
+    nextBtn.textContent = '🏆 Back to Home';
+    nextBtn.onclick = () => showView('welcome');
+  }
+
+  overlay.classList.add('visible');
+  updateProgress();
+  updateSidebar();
+}
+
+function nextActivity() {}
+function retryActivity() {
+  startActivity(state.currentActivity);
+}
+
+// ── TOAST ──
+function toast(msg, type='hint', duration=3500) {
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  const icons = {success:'✅', error:'⚠️', hint:'💡'};
+  el.innerHTML = `<span>${icons[type]||'💡'}</span><span>${msg}</span>`;
+  wrap.appendChild(el);
+  setTimeout(() => {
+    el.classList.add('removing');
+    setTimeout(() => el.remove(), 300);
+  }, duration);
+}
+
+// ── GLOBAL KEYBOARD ──
+function handleGlobalKey(e) {
+  const n = state.currentActivity;
+  const key = e.key.toLowerCase();
+  const win = e.metaKey || e.key === 'Meta';
+  const ctrl = e.ctrlKey;
+
+  // Win+D
+  if ((e.key === 'd' || e.key === 'D') && e.getModifierState('OS') || (e.key === 'd' && ctrl)) {
+    if (n === 6) { e.preventDefault(); completeActivity(6, "Win+D sweeps all windows away instantly — your screen is clear!"); }
+  }
+  // Win+1
+  if (e.key === '1' && ctrl) {
+    e.preventDefault();
+    if (n === 9) {
+      openWindow('explorer');
+      completeActivity(9, "Win+1 launched File Explorer — your first pinned app!"); 
+    }
+  }
+  // Win+N (Notifications)
+  if ((e.key === 'n' || e.key === 'N') && ctrl) {
+    e.preventDefault();
+    if (n === 10) { toggleNotifPanel(); completeActivity(10, "Notification Center is open! You can see all your alerts here."); }
+  }
+  // Win+Tab
+  if (e.key === 'Tab' && ctrl) {
+    e.preventDefault();
+    if (n === 24) { openTaskView(); completeActivity(24, "Task View shows all your open windows at once — perfect for multitasking!"); }
+  }
+  // Ctrl+C
+  if (key === 'c' && ctrl && !e.shiftKey) {
+    if (n === 19) {
+      const textarea = document.getElementById('notepadText');
+      if (textarea.selectionStart !== textarea.selectionEnd) {
+        state.copiedText = true;
+        toast('📋 Copied! Text is now on your invisible clipboard.', 'success');
+        setTimeout(() => completeActivity(19, "Ctrl+C copied your selected text. Now you can paste it anywhere!"), 1000);
+      } else {
+        toast('⚠️ First select some text by clicking and dragging!', 'error');
+      }
+    }
+  }
+  // Ctrl+V
+  if (key === 'v' && ctrl) {
+    if (n === 20) {
+      if (state.copiedText || state.completed.has(19)) {
+        const ta = document.getElementById('notepadText');
+        ta.value += '\nWelcome to Styles & Smiles!';
+        toast('📋 Pasted! Your text appeared.', 'success');
+        setTimeout(() => completeActivity(20, "Ctrl+V pasted your text. Copy + Paste is one of the most useful shortcuts!"), 1000);
+      } else {
+        toast('⚠️ Copy something first with Ctrl+C!', 'error');
+      }
+    } else if (n === 20 && key === 'p') {
+      toast("⚠️ Remember: Ctrl+P is for Print! Use Ctrl+V to Paste.", 'error');
+    }
+  }
+  // Ctrl+Z
+  if (key === 'z' && ctrl) {
+    if (n === 21) {
+      document.getElementById('notepadText').value = "Welcome to Styles & Smiles!\nThis is your practice document.\nYou can copy, paste, undo, and save text here.";
+      toast('↩️ Undo worked! Your text is back.', 'success');
+      setTimeout(() => completeActivity(21, "Ctrl+Z is your digital safety net. You can always undo mistakes!"), 1000);
+    }
+  }
+  // Ctrl+S
+  if (key === 's' && ctrl) {
+    e.preventDefault();
+    if (n === 22) {
+      state.notepadSaved = true;
+      const titleEl = document.querySelector('#notepadWindow .win-title');
+      if (titleEl) titleEl.textContent = 'Notepad — styles_and_smiles.txt';
+      toast('💾 File saved!', 'success');
+      setTimeout(() => completeActivity(22, "Ctrl+S saved your document. Always save before closing!"), 800);
+    }
+  }
+  // Ctrl+T in explorer
+  if (key === 't' && ctrl) {
+    if (n === 17) { addExplorerTab(); }
+  }
+  // Ctrl+P warning
+  if (key === 'p' && ctrl) {
+    e.preventDefault();
+    toast("⚠️ Ctrl+P opens the Print dialog! To Paste, use Ctrl+V.", 'error');
+  }
+}
+
+// ── DESKTOP CLICK HANDLERS ──
+function handleDesktopClick(e) {
+  if (e.target.closest('.desktop-icon')) return;
+  if (e.target.closest('.app-window')) return;
+  if (e.target.closest('.win-taskbar')) return;
+  if (e.target.closest('.ctx-menu')) return;
+  closeCtxMenus();
+  document.querySelectorAll('.desktop-icon.selected').forEach(el => el.classList.remove('selected'));
+
+  const n = state.currentActivity;
+  if (n === 6) {
+    completeActivity(6, "Great! Win+D clears the desktop. Try the keyboard shortcut too.");
+  }
+}
+
+function handleDesktopDblClick(e) {
+  if (e.target.closest('.desktop-icon')) return;
+}
+
+function handleDesktopRightClick(e) {
+  e.preventDefault();
+  if (e.target.closest('.desktop-icon')) return;
+  if (e.target.closest('.app-window')) return;
+  if (e.target.closest('.win-taskbar')) return;
+  showCtxMenu(e.clientX, e.clientY);
+}
+
+function handleIconClick(e, name) {
+  e.stopPropagation();
+  closeCtxMenus();
+  const icon = document.getElementById(`icon-${name}`);
+  document.querySelectorAll('.desktop-icon.selected').forEach(el => el.classList.remove('selected'));
+  icon.classList.add('selected');
+
+  const n = state.currentActivity;
+  if (n === 1) {
+    completeActivity(1, "Perfect single click! You selected the icon without opening it — just like browsing the menu.");
+  }
+  if (n === 15 && (name === 'invoice1' || name === 'invoice2')) {
+    if (!state.selectedIcons.has(name)) {
+      state.selectedIcons.add(name);
+      icon.classList.add('selected');
+      if (state.selectedIcons.size === 2) {
+        toast('Both files selected! Now drag them to the Invoices folder.', 'hint');
+      }
+    }
+  }
+}
+
+function handleIconDblClick(e, name) {
+  e.stopPropagation();
+  e.preventDefault();
+  const n = state.currentActivity;
+  if (n === 2 && name === 'browser') {
+    toast('🌐 Chrome is opening...', 'success');
+    completeActivity(2, "Double-click opened Chrome! Two clicks = you really mean it.");
+  }
+  if (name === 'notepad') { openWindow('notepad'); }
+  if (name === 'browser') { toast('🌐 Chrome would open here.', 'hint'); }
+}
+
+function handleIconRightClick(e, name) {
+  e.preventDefault();
+  e.stopPropagation();
+  state.rightClickTarget = name;
+  const icon = document.getElementById(`icon-${name}`);
+  document.querySelectorAll('.desktop-icon.selected').forEach(el => el.classList.remove('selected'));
+  icon.classList.add('selected');
+
+  const n = state.currentActivity;
+  if (n === 3 && name === 'browser') {
+    showIconCtxMenu(e.clientX, e.clientY);
+    toast('Right-click menu opened! Just like long-press on your phone.', 'success');
+    setTimeout(() => completeActivity(3, "Right-click reveals hidden options — you've unlocked the secret menu!"), 1500);
+  } else {
+    showIconCtxMenu(e.clientX, e.clientY);
+  }
+}
+
+// ── CONTEXT MENUS ──
+function showCtxMenu(x, y) {
+  closeCtxMenus();
+  const menu = document.getElementById('ctxMenu');
+  const ws = document.getElementById('winScreen');
+  const rect = ws.getBoundingClientRect();
+  menu.style.left = Math.min(x - rect.left, rect.width - 200) + 'px';
+  menu.style.top = Math.min(y - rect.top, rect.height - 200) + 'px';
+  menu.classList.add('visible');
+}
+
+function showIconCtxMenu(x, y) {
+  closeCtxMenus();
+  const menu = document.getElementById('iconCtxMenu');
+  const ws = document.getElementById('winScreen');
+  const rect = ws.getBoundingClientRect();
+  menu.style.left = Math.min(x - rect.left, rect.width - 200) + 'px';
+  menu.style.top = Math.min(y - rect.top, rect.height - 200) + 'px';
+  menu.classList.add('visible');
+}
+
+function closeCtxMenus() {
+  document.querySelectorAll('.ctx-menu').forEach(m => m.classList.remove('visible'));
+}
+
+function ctxAction(action) {
+  closeCtxMenus();
+  const n = state.currentActivity;
+  if (action === 'sort' && n === 14) {
+    state.sortedDesktop = true;
+    toast('🗂️ Desktop sorted by Item Type!', 'success');
+    completeActivity(14, "Sort by Item Type groups all similar files together — tidy desk, tidy mind!");
+  }
+  if (action === 'new-folder') {
+    if (n === 12) {
+      // Add a new folder icon
+      const newFolder = document.createElement('div');
+      newFolder.className = 'desktop-icon';
+      newFolder.id = 'icon-newfolder';
+      newFolder.style.cssText = 'top:260px;left:30px;';
+      newFolder.innerHTML = `<div class="d-ico">📁</div><div class="d-label">New Folder</div>`;
+      newFolder.oncontextmenu = (e) => { e.preventDefault(); e.stopPropagation(); state.rightClickTarget='newfolder'; showIconCtxMenu(e.clientX, e.clientY); };
+      document.getElementById('winScreen').appendChild(newFolder);
+      state.newFolderCreated = true;
+      toast('📁 New folder created on the desktop!', 'success');
+      completeActivity(12, "New folder created! You've added a fresh empty folder to your desktop.");
+    } else {
+      toast('📁 New folder created!', 'success');
+    }
+  }
+}
+
+function iconCtxAction(action) {
+  closeCtxMenus();
+  const target = state.rightClickTarget;
+  const n = state.currentActivity;
+
+  if (action === 'pin-taskbar') {
+    if (n === 7 && target === 'notepad') {
+      const tb = document.getElementById('winTaskbar');
+      const notepadBtn = document.createElement('div');
+      notepadBtn.className = 'taskbar-icon pinned';
+      notepadBtn.textContent = '📝';
+      notepadBtn.dataset.tooltip = 'Notepad';
+      notepadBtn.setAttribute('data-tooltip', 'Notepad (pinned)');
+      tb.insertBefore(notepadBtn, document.getElementById('tb-maps'));
+      toast('📌 Notepad pinned to taskbar! It\'s now on your rolling trolley.', 'success');
+      completeActivity(7, "Notepad is now pinned to your taskbar — always one click away!");
+    } else {
+      toast('📌 App pinned to taskbar!', 'success');
+    }
+  }
+  if (action === 'pin-qa' && n === 16 && target === 'invoices') {
+    document.getElementById('qaInvoices').style.display = 'flex';
+    toast('⚡ Invoices folder pinned to Quick Access!', 'success');
+    completeActivity(16, "Invoices is now in Quick Access — one click from anywhere in File Explorer!");
+  }
+  if (action === 'rename') {
+    if (n === 13 || target === 'newfolder') {
+      const folderEl = document.getElementById(`icon-${target}`);
+      const label = folderEl ? folderEl.querySelector('.d-label') : null;
+      if (label) {
+        const oldName = label.textContent;
+        const newName = prompt('Rename folder:', 'Invoices 2026') || oldName;
+        label.textContent = newName;
+        toast(`✏️ Folder renamed to "${newName}"!`, 'success');
+        if (n === 13) completeActivity(13, `Renamed to "${newName}"! You can rename any file or folder this way.`);
+      }
+    }
+  }
+  if (action === 'open') {
+    if (target === 'browser') { toast('🌐 Chrome is opening...', 'hint'); }
+    if (target === 'invoices' || target === 'newfolder') { openWindow('explorer'); }
+  }
+}
+
+// ── DRAG & DROP ──
+let dragState = { active: false, icon: null, startX: 0, startY: 0, origLeft: 0, origTop: 0 };
+
+document.addEventListener('mousedown', e => {
+  const icon = e.target.closest('.desktop-icon');
+  if (!icon) return;
+  if (e.button !== 0) return;
+  dragState.active = true;
+  dragState.icon = icon;
+  dragState.startX = e.clientX;
+  dragState.startY = e.clientY;
+  dragState.origLeft = parseInt(icon.style.left);
+  dragState.origTop = parseInt(icon.style.top);
+
+  const ghost = document.getElementById('dragGhost');
+  ghost.querySelector('#dragGhostIcon').textContent = icon.querySelector('.d-ico').textContent;
+  ghost.querySelector('#dragGhostLabel').textContent = icon.querySelector('.d-label').textContent;
+});
+
+document.addEventListener('mousemove', e => {
+  if (!dragState.active || !dragState.icon) return;
+  const dx = e.clientX - dragState.startX;
+  const dy = e.clientY - dragState.startY;
+  if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+    const ghost = document.getElementById('dragGhost');
+    ghost.classList.add('active');
+    ghost.style.left = (e.clientX + 10) + 'px';
+    ghost.style.top = (e.clientY - 20) + 'px';
+    dragState.icon.style.opacity = '0.4';
+  }
+});
+
+document.addEventListener('mouseup', e => {
+  if (!dragState.active || !dragState.icon) return;
+  const icon = dragState.icon;
+  const ghost = document.getElementById('dragGhost');
+  ghost.classList.remove('active');
+  icon.style.opacity = '1';
+
+  const dx = e.clientX - dragState.startX;
+  const dy = e.clientY - dragState.startY;
+  const moved = Math.abs(dx) > 10 || Math.abs(dy) > 10;
+
+  if (moved) {
+    const ws = document.getElementById('winScreen');
+    const rect = ws.getBoundingClientRect();
+    const newLeft = Math.max(0, Math.min(e.clientX - rect.left - 40, rect.width - 90));
+    const newTop = Math.max(0, Math.min(e.clientY - rect.top - 40, rect.height - 90));
+    icon.style.left = newLeft + 'px';
+    icon.style.top = newTop + 'px';
+
+    const n = state.currentActivity;
+    if (n === 4) {
+      completeActivity(4, "You dragged and dropped the folder! Drag & drop moves things around your digital workspace.");
+    }
+    if (n === 15 && state.selectedIcons.size >= 1) {
+      // Check if dropped on invoices folder
+      const invRect = document.getElementById('icon-invoices').getBoundingClientRect();
+      if (e.clientX > invRect.left && e.clientX < invRect.right && e.clientY > invRect.top && e.clientY < invRect.bottom) {
+        document.getElementById('icon-invoice1').style.display = 'none';
+        document.getElementById('icon-invoice2').style.display = 'none';
+        toast('📦 Files moved to Invoices folder!', 'success');
+        completeActivity(15, "Files moved! You can move multiple files at once by selecting them first.");
+      }
+    }
+  }
+
+  dragState.active = false;
+  dragState.icon = null;
+});
+
+// ── SCROLL ACTIVITY ──
+function handleDocScroll(el) {
+  // Use a generous 40px threshold so it triggers reliably
+  const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 40;
+  if (atBottom && state.currentActivity === 5) {
+    completeActivity(5, "You scrolled all the way down! The scroll wheel is your best friend for long documents.");
+  }
+}
+
+// ── ON-SCREEN KEY BUTTON (for Win+1 and Win+Tab which OS intercepts) ──
+function handleOnscreenKey() {
+  const n = state.currentActivity;
+  if (n === 9) {
+    openWindow('explorer');
+    toast('🪟 Win + 1 pressed — File Explorer launched!', 'success');
+    completeActivity(9, "Win+1 launched File Explorer — your first pinned app! Great shortcut to remember.");
+  }
+  if (n === 24) {
+    openTaskView();
+    toast('🪟 Win + Tab pressed — Task View is open!', 'success');
+    completeActivity(24, "Task View shows all your open windows at once — perfect for multitasking!");
+  }
+}
+
+// ── TASKBAR DRAG (Activity 8: rearrange Maps left of WhatsApp) ──
+function setupTaskbarDrag() {
+  const taskbar = document.getElementById('winTaskbar');
+  let dragging = null;
+  let dragClone = null;
+  let startX = 0;
+
+  function onTbMouseDown(e) {
+    const icon = e.target.closest('.taskbar-icon');
+    if (!icon || icon.id === 'tb-start' || icon.id === 'tb-search' || icon.id === 'tb-bell') return;
+    if (icon.id !== 'tb-maps') return; // only maps is draggable in this activity
+    e.preventDefault();
+    dragging = icon;
+    startX = e.clientX;
+    icon.style.opacity = '0.4';
+    toast('👆 Dragging Maps — drop it left of WhatsApp!', 'hint', 2000);
+  }
+
+  function onTbMouseMove(e) {
+    if (!dragging) return;
+  }
+
+  function onTbMouseUp(e) {
+    if (!dragging) return;
+    dragging.style.opacity = '1';
+    const dx = e.clientX - startX;
+    // Maps needs to move LEFT (negative dx) past WhatsApp
+    if (dx < -20) {
+      // Reorder: move maps before whatsapp in DOM
+      const wa = document.getElementById('tb-whatsapp');
+      taskbar.insertBefore(dragging, wa);
+      toast('✅ Maps is now left of WhatsApp!', 'success');
+      completeActivity(8, "Taskbar rearranged! Keep your most-used apps in the order that works best for you.");
+    } else {
+      toast('↔️ Drag it further LEFT past WhatsApp to reorder.', 'hint', 2500);
+    }
+    dragging = null;
+  }
+
+  taskbar.addEventListener('mousedown', onTbMouseDown);
+  document.addEventListener('mousemove', onTbMouseMove);
+  document.addEventListener('mouseup', onTbMouseUp);
+}
+
+// ── WINDOWS ──
+function openWindow(name) {
+  const winIds = { notepad: 'notepadWindow', explorer: 'explorerWindow' };
+  const el = document.getElementById(winIds[name]);
+  if (el) { el.classList.add('open'); bringToFront(el); }
+}
+
+function closeWindow(name) {
+  const winIds = { notepad: 'notepadWindow', explorer: 'explorerWindow' };
+  const el = document.getElementById(winIds[name]);
+  if (el) { el.classList.remove('open', 'maximized'); }
+}
+
+function minimizeWindow(name) {
+  closeWindow(name);
+  const n = state.currentActivity;
+  if (n === 23) {
+    if (state.windowMaximized) {
+      toast('─ Window minimized to taskbar! Click the taskbar icon to bring it back.', 'success');
+      completeActivity(23, "Maximize then minimize — you control your screen like a pro!");
+    } else {
+      toast('Minimize works! Now try maximizing first with the ⬜ button.', 'hint');
+    }
+  }
+}
+
+function toggleMaximize(name) {
+  const winIds = { notepad: 'notepadWindow', explorer: 'explorerWindow' };
+  const el = document.getElementById(winIds[name]);
+  if (!el) return;
+  const isMax = el.classList.toggle('maximized');
+  if (state.currentActivity === 23) {
+    if (isMax) {
+      state.windowMaximized = true;
+      toast('⬜ Window maximized! Now click ─ to minimize it.', 'success');
+    } else {
+      toast('Restored to normal size.', 'hint');
+    }
+  }
+}
+
+function bringToFront(el) {
+  document.querySelectorAll('.app-window').forEach(w => w.style.zIndex = '10');
+  el.style.zIndex = '11';
+}
+
+// ── NOTIFICATIONS ──
+function toggleNotifPanel() {
+  const panel = document.getElementById('notifPanel');
+  const isVisible = panel.classList.toggle('visible');
+  const n = state.currentActivity;
+  if (n === 10 && isVisible) {
+    completeActivity(10, "Notification Center is open! You can manage all your alerts in one place.");
+  }
+}
+
+function toggleDND() {
+  state.dndOn = !state.dndOn;
+  const sw = document.getElementById('dndSwitch');
+  sw.classList.toggle('on', state.dndOn);
+  const n = state.currentActivity;
+  if (n === 11) {
+    if (state.dndOn) {
+      toast('🌙 Do Not Disturb is ON — no more interruptions!', 'success');
+      completeActivity(11, "Do Not Disturb is on! Perfect for when you're focused on a client.");
+    } else {
+      toast('Notifications back on.', 'hint');
+    }
+  }
+}
+
+// ── START MENU ──
+function toggleStartMenu() {
+  const menu = document.getElementById('startMenu');
+  const isHidden = menu.style.display === 'none' || !menu.style.display;
+  menu.style.display = isHidden ? 'block' : 'none';
+  if (isHidden) {
+    state.startMenuOpened = true;
+    setTimeout(() => document.getElementById('startSearch').focus(), 100);
+  }
+}
+
+function closeStartMenu() {
+  document.getElementById('startMenu').style.display = 'none';
+}
+
+function handleStartSearch(val) {
+  const results = document.getElementById('startResults');
+  results.style.display = val.toLowerCase().includes('note') ? 'block' : 'none';
+}
+
+function openFromStart() {
+  closeStartMenu();
+  openWindow('notepad');
+  const n = state.currentActivity;
+  if (n === 18) {
+    completeActivity(18, "You searched and opened Notepad from the Start menu — just like looking up a product in a catalogue!");
+  }
+}
+
+// ── FILE EXPLORER TABS ──
+function addExplorerTab() {
+  state.explorerTabs++;
+  const tabBar = document.getElementById('feTabBar');
+  const addBtn = tabBar.querySelector('.fe-add-tab');
+  const tab = document.createElement('div');
+  tab.className = 'fe-tab active';
+  tab.innerHTML = `📁 This PC <span class="tab-close">✕</span>`;
+  document.querySelectorAll('.fe-tab').forEach(t => t.classList.remove('active'));
+  tabBar.insertBefore(tab, addBtn);
+  toast('➕ New File Explorer tab opened!', 'success');
+  const n = state.currentActivity;
+  if (n === 17) {
+    completeActivity(17, "New tab in File Explorer! Works just like browser tabs — multitask like a pro.");
+  }
+}
+
+function feNavigate(dest) {
+  document.querySelectorAll('.fe-sidebar-item').forEach(el => el.classList.remove('active'));
+}
+
+function feSelectItem(el, name) {
+  document.querySelectorAll('.fe-item').forEach(i => i.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ── TASK VIEW ──
+function openTaskView() {
+  document.getElementById('taskViewOverlay').style.display = 'block';
+  state.taskViewOpened = true;
+}
+
+function closeTaskView() {
+  document.getElementById('taskViewOverlay').style.display = 'none';
+}
+
+// ── HOVER PULSE TIMER ──
+function setupHoverTimer() {
+  const ws = document.getElementById('winScreen');
+  let timer;
+  ws.onmousemove = () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      // Re-pulse targets after 10s idle
+      const act = activities[state.currentActivity];
+      if (act && act.target) {
+        const target = document.getElementById(`icon-${act.target}`);
+        if (target && !state.completed.has(state.currentActivity)) {
+          target.classList.add('pulsing');
+        }
+      }
+    }, 10000);
+  };
+}
+
+// ── CLOCK ──
+function updateClock() {
+  const now = new Date();
+  let h = now.getHours(), m = now.getMinutes();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  document.getElementById('taskbarClock').innerHTML = `${h}:${String(m).padStart(2,'0')}<br>${ampm}`;
+}
+updateClock();
+setInterval(updateClock, 60000);
+
+// ── NOTEPAD KEY HANDLER ──
+function handleNotepadKey(e) {
+  // handled by global key handler
+}
+
+// ── INIT ──
+document.addEventListener('click', e => {
+  if (!e.target.closest('.ctx-menu') && !e.target.closest('.desktop-icon')) {
+    closeCtxMenus();
+  }
+  if (!e.target.closest('#startMenu') && !e.target.closest('#tb-start') && !e.target.closest('#tb-search')) {
+    closeStartMenu();
+  }
+  if (!e.target.closest('#notifPanel') && !e.target.closest('#tb-bell')) {
+    document.getElementById('notifPanel').classList.remove('visible');
+  }
+});
+
+document.onkeydown = handleGlobalKey;
+showView('welcome');
+updateProgress();
+</script>
+</body>
+</html>
